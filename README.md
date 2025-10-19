@@ -1,6 +1,6 @@
 # Demenstration of the code for the paper: *'Digital adiabatic evolution is universally accurate'*
 
-This repository contains the Python source code for the numerical simulations presented in our paper: *'Digital adiabatic evolution is universally accurate'*, including the Trotterized and GQSP-based Adiabatic State Preparation (ASP) for molecular systems, as well as the adiabatic algorithm for the Quantum Linear System Problem (QLSP).
+This repository contains the Python source code for the numerical simulations presented in our paper: *'Digital adiabatic evolution is universally accurate'* (https://arxiv.org/abs/2208.13966), including the Trotterized and GQSP-based Adiabatic State Preparation (ASP) for molecular systems, as well as the adiabatic algorithm for the Quantum Linear System Problem (QLSP).
 
 ---
 
