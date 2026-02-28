@@ -29,10 +29,11 @@ This project requires only a standard computer with enough RAM to support the in
 ### Software requirements
 
 * OS Requirements
-This package is supported for Linux. The package has been tested on the following system:
+This package is supported for Linux and Mac. The package has been tested on the following system:
 
 ```bash
 Linux: Rocky 8.7
+Mac: 15.7.3
 ```
 
 * Python Dependencies
