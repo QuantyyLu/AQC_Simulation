@@ -14,6 +14,7 @@ In folder Code:
 * `QLSP.py`: Main script to generate data for the adiabatic algorithm for the Quantum Linear System Problem (QLSP). This corresponds to **Fig 3(e-f)** in our paper.
 * `utils.py`: A utility module containing helper functions used by the main scripts.
 * `Func_for_QLSP.py`: A module containing specific functions required for the QLSP simulations.
+* `sparse_matrix_N=16.txt`, `sparse_matrix_N=32.txt`, `sparse_matrix_N=32`, `sparse_matrix_N=64.txt`: Text files containing the sparse matrices and sparse vectors used in the QLSP simulations.
 
 In Fig.zip:
 * `Figdrawer.ipynb`: A programme to draw the figures in the Numerical Simulation part.
