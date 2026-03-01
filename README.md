@@ -88,5 +88,14 @@ Run `/Fig/Figdrawer.ipynb`
 ## 📊 Output
 The scripts will run the simulations and save the output data files into the `Data/` directory. You can then use this data for analysis and plotting.
 
+## Demo Folder:
+
+* Runtime:
+Programs in the demo Folder share the same names as those in the Code folder but their dataset is small and their runtime is expected within 10s. 
+
+* Output:
+The total error, the Trotter/GQSP error, and the non-adiabatic error for each T or n will be printed in the terminal.
+
+
 ## License
 This project is covered under the Apache 2.0 License.
