@@ -64,23 +64,29 @@ You are advised to create a folder named `Data` in the root directory of this pr
 mkdir Data
 ```
 
-### 3. Run the Scripts:
+### 3. Run the Scripts & Reproduction instructions:
 Execute the Python scripts from your terminal. Each script corresponds to different figures in the paper as described below.
 
 * To reproduce Fig 2(a) and Fig 3(a-c):
+
+Change the parameters in `Trotter_mole.py`  T_list and n_list to the desired values following the manuscript, and then run:
+
 ```bash
 python3 Trotter_mole.py
 ```
 
 * To reproduce Fig 3(d):
+Change the parameters in `GQSP_mole.py` T_list, dt and K to the desired values following the manuscript, and then run:
 ```bash
 python3 GQSP_mole.py
 ```
 
 * To reproduce Fig 3(e-f):
+Change the parameters in `QLSP.py` dt, K and Ts to the desired values following the manuscript, and then run:
 ```bash
 python3 QLSP.py
 ```
+
 
 * To draw Fig 2-3:
 Run `/Fig/Figdrawer.ipynb`
