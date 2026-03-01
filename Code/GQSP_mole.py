@@ -79,11 +79,8 @@ integral_filename = ''
 
 # ASP conditions
 # Weight strategy should be "Lin", "Sin", "Squ", "SinCub", or "Cub"
-evolution_time       = 20
 weight_strategy      = "Lin"
 trotter_order        = 1
-num_steps            = ceil(evolution_time*2.0)
-
 #
 host = socket.gethostname()
 start_time = time.time()
@@ -136,8 +133,6 @@ print("E(FCI_final) = {:.10f}".format(fci_energy.real)," Hartree")
 
 #----------------------------------------------------------------------------------------------------#
 # Generate quantum circuit for the time-independent Hamiltonian
-time_for_single_trotter = evolution_time / num_steps
-
 
 # Preliminary steps: Use time-independent Hamiltonian only
 print("\n   Time  s(t)   E(ASP)/Hartree    E(Exact)/Hartree   Tro-error  total-error  ad-error")
@@ -150,14 +145,14 @@ h_ins_jw = h_fock_jw
 h_ins_sparse = h_fock_sparse
 
 compare_with_ins_ground_state = False
-# T_list = [10,20,40,80,150,300,500,700,1000]
-T_list = [100]
+T_list = [10,20,40,80,150,300,500,700,1000]
+# T_list = [10]
 # n_list = [10, 20,40,80,100,150,200,250,300,350,400,450,500,700,1000]
 # n_list = [200]
 dt = 0.2
 # n_list = [200]
 alpha = 12
-len_power = 1
+len_power = 1 
 power = [1.5**(i-len_power//2) for i in range(len_power)]
 # power = [1]
 ASP_error = []
@@ -165,7 +160,7 @@ Exact_error = []
 Trotter_error = []
 with open("Data/GQSP_mole.txt","w") as File1:
     for evolution_time in T_list:
-        K = 4 * int(evolution_time)
+        K = 4 * int(np.log10(evolution_time))
     if True:
             # tmp = 4 * sqrt(num_steps)
             num_steps = 5 * evolution_time

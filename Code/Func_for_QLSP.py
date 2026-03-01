@@ -14,128 +14,111 @@ from itertools import product
 
 def retain_random_elements(A, s):
     """
-    对于矩阵A的每一行，随机保留至多s个元素，其余元素置零。
-    
-    参数:
-    A (np.ndarray): 输入矩阵
-    s (int): 每行保留的最多元素数量
-    
-    返回:
-    np.ndarray: 修改后的矩阵A
-    """
-    # 创建一个与A形状相同的掩码矩阵
+    For each row of the matrix A, randomly retain at most s elements and set the rest to zero.
+    Parameters:
+    A (np.ndarray): The input matrix
+    s (int): The maximum number of elements to retain in each row
+    Returns:
+    np.ndarray: The modified matrix A with at most s non-zero elements per row
+    """    
     mask = np.zeros_like(A, dtype=bool)
     
-    # 对每一行进行处理
     for i in range(A.shape[0]):
-        # 获取当前行的所有列索引
         col_indices = np.arange(A.shape[1])
         
-        # 随机选择至多s个列索引
         selected_indices = np.random.choice(col_indices, min(s, A.shape[1]), replace=False)
         
-        # 将掩码矩阵中对应位置设置为True
         mask[i, selected_indices] = True
     
-    # 应用掩码，将A中未被选择的元素置零
     A[~mask] = 0
     
     return A
 
 def generate_one_sparse_matrix(kappa, N, s):
-    # Step 1: 生成对角矩阵，其特征值在 [1, kappa] 之间
+    # Step 1: Generating a diagonal matrix with eigenvalues between 1 and kappa
     eigenvalues = np.linspace(1, kappa, N)
     D = np.diag(eigenvalues)
     
-    # Step 2: 生成随机正交矩阵
+    # Step 2: Generate a random orthogonal matrix
     Q, _ = qr(np.random.randn(N, N))
     
-    # Step 3: 形成具有所需条件数的矩阵
+    # Step 3: Construct the matrix with the desired condition number
     A = Q @ D @ Q.T
-    
-    # Step 4: 将矩阵稀疏化
+     
     A_sparse = retain_random_elements(A, s)
-    
-    # 确保稀疏矩阵的对称性
     A_sparse = (A_sparse + A_sparse.T) / 2
     
     return csr_matrix(A_sparse)
 
 def save_sparse_matrix_to_txt(A, filename):
     """
-    将稀疏矩阵保存到.txt文件中。
-    
-    参数:
-    A (sp.csr_matrix): 输入的稀疏矩阵
-    filename (str): 保存的文件名
+    Save a sparse matrix to a .txt file.
+    Parameters:
+    A (sp.csr_matrix): The sparse matrix to be saved
+    filename (str): The name of the file to save the matrix to
     """
-    # 将稀疏矩阵转换为COO格式
+    # Transform the sparse matrix to COO format for easier iteration
     A_coo = A.tocoo()
     
-    # 打开文件并写入数据
     with open(filename, 'w') as f:
         for i, j, v in zip(A_coo.row, A_coo.col, A_coo.data):
             f.write(f"{i} {j} {v}\n")
 
 def read_sparse_matrix_from_txt(filename):
     """
-    从.txt文件中读取稀疏矩阵。
-    
-    参数:
-    filename (str): 文件名
-    
-    返回:
-    sp.coo_matrix: 读取的稀疏矩阵
+    Read a sparse matrix from a .txt file.
+    Parameters:
+    filename (str): The name of the file to read the matrix from
+    Returns:
+    sp.coo_matrix: The sparse matrix read from the file
     """
-    # 初始化空的行、列和数据列表
     row = []
     col = []
     data = []
     
-    # 打开文件并读取数据
     with open(filename, 'r') as f:
         for line in f:
-            # 解析每一行，获取行索引、列索引和值
             i, j, v = map(float, line.split())
             row.append(int(i))
             col.append(int(j))
             data.append(v)
     
-    # 创建COO格式的稀疏矩阵
+    # Create a COO format sparse matrix
     A_coo = sp.coo_matrix((data, (row, col)))
     
     return A_coo
 
 def generate_sparse_matrix(kappa, N, s, condition):
-    # 参数
     while True:
-        # 生成矩阵
+        # generate a sparse matrix with the specified condition number
         A = generate_one_sparse_matrix(kappa, N, s)
         condition_number = np.linalg.cond(A.toarray())
         if condition_number <= condition:
             break
-    # 打印结果
-    print("生成的稀疏矩阵:")
+    # Print the generated sparse matrix and its condition number
+    print("Sparse matrix generated:")
     print(A.toarray())
 
-    # 检查条件数
+    # Check the condition number
     condition_number = np.linalg.cond(A.toarray())
-    print(f"条件数: {condition_number}")
-    save_sparse_matrix_to_txt(A,f'tmp_sparse_matrix_N={N}.txt')
+    print(f"Condition number: {condition_number}")
+    save_sparse_matrix_to_txt(A,f'sparse_matrix_N={N}.txt')
 
 
-def generate_sparse_normalized_vector(N, s):
+def generate_sparse_normalized_vector(N):
     """
-    生成一个随机的、至多有s个非零元素的N维向量，并进行归一化。
-    
-    参数:
-    N (int): 向量的维度
-    s (int): 非零元素的最大数量
-    
-    返回:
-    np.ndarray: 归一化后的N维向量
-    """
-    s = min(s, N)
+    Generate a random N-dimensional vector with at most s non-zero elements and normalize it.
+    Parameters:
+    N (int): Dimension of the vector
+    s (int): Maximum number of non-zero elements
+    Returns:
+    np.ndarray: Normalized N-dimensional vector
+    """    
+
+    if N == 16:
+        s = 4
+    elif N == 32:
+        s = 5
     b = np.zeros(N)
     non_zero_indices = np.random.choice(N, s, replace=False)
     b[non_zero_indices] = np.random.randn(s)
@@ -147,36 +130,35 @@ def generate_sparse_normalized_vector(N, s):
 
 def write_vector_to_txt(vector, filename):
     """
-    将向量写入到.txt文件中。
-    
-    参数:
-    vector (np.ndarray): 要写入的向量
-    filename (str): 保存的文件名
+    Write a vector to a .txt file. 
+    Parameters:
+    vector (np.ndarray): The vector to be written to the file
+    filename (str): The name of the file to save the vector to    
     """
     np.savetxt(filename, vector, delimiter=',')
-    # print(f"向量已保存到 {filename} 文件中。")
+    # print(f"Vector saved to {filename}")
 
 def read_vector_from_txt(filename):
     """
-    从.txt文件中读取向量。
+    Read a vector from a .txt file.    
+    Parameters:
     
-    参数:
-    filename (str): 文件名
+    filename (str): file name to read the vector from
     
-    返回:
-    np.ndarray: 读取的向量
+    Returns:
+    np.ndarray: the vector read from the file
     """
     vector = np.loadtxt(filename, delimiter=',')
-    # print(f"从文件 {filename} 中读取的向量：", vector)
+    # print(f"Vector read from {filename}: {vector}")
     return vector
 
 
 def data_generating():
     generate_sparse_matrix(kappa=5, N=16, s=4, condition=10)
     generate_sparse_matrix(kappa=5, N=32, s=5, condition=50)
-    b = generate_sparse_normalized_vector(N=16, s=5)
+    b = generate_sparse_normalized_vector(N=16)
     write_vector_to_txt(b, filename='sparse_vec_N=16.txt')
-    b = generate_sparse_normalized_vector(N=32, s=5)
+    b = generate_sparse_normalized_vector(N=32)
     write_vector_to_txt(b, filename='sparse_vec_N=32.txt')
 
 
@@ -190,17 +172,13 @@ def data_loading(N):
 def tensor_product(matrix1, matrix2):
     dim = len(matrix1.shape)
     if dim == 1:
-        # 使用 np.einsum 计算张量积并保持原始维数
         tensor_product = np.einsum('i,j->ij', matrix1, matrix2)
 
-        # 将结果重新排列为原始维数
         result = tensor_product.reshape(matrix1.shape[0] * matrix2.shape[0])
         return result
     if dim == 2:
-        # 使用 np.einsum 计算张量积并保持原始维数
         tensor_product = np.einsum('ij,kl->ikjl', matrix1, matrix2)
 
-        # 将结果重新排列为原始维数
         result = tensor_product.reshape(matrix1.shape[0] * matrix2.shape[0], matrix1.shape[1] * matrix2.shape[1])
         return result
 
@@ -248,7 +226,7 @@ def integrand(x_prime):
 def calculate_integral(x, epsilon=1e-10):
     if x < epsilon :
         return 0
-    # 避免在0和1处的奇异性
+    # Avoid singularity at 0 and 1
     result, _ = quad(integrand, epsilon, x - epsilon)
     return result
 
@@ -266,14 +244,14 @@ def schedule(x, funcname = 'Linear',epsilon=1e-10):
 
 
 def pauli_string_to_matrix(pauli_string):
-    """将Pauli字符串转换为矩阵"""
+    """ Translate a Pauli string to a matrix"""
     result = 1
     for p in pauli_string:
         result = np.kron(result, pauli_matrices[p])
     return result
 
 def decompose_to_pauli_strings(H):
-    """将厄密矩阵分解为Pauli字符串的和"""
+    """Decompose a Hermitian matrix into a sum of Pauli strings"""
     n = int(np.log2(H.shape[0]))
     pauli_strings = list(product(range(4), repeat=n))
     coefficients = []
@@ -286,7 +264,7 @@ def decompose_to_pauli_strings(H):
     return coefficients, pauli_strings
 
 def pauli_string_to_label(pauli_string):
-    """将Pauli字符串转换为标签"""
+    """Translate a Pauli string to a label"""
     return ''.join(pauli_labels[p] for p in pauli_string)
 
 def trotterization(H,dt):
@@ -313,11 +291,8 @@ def trotterization(H,dt,reverse = False):
     return H_trotter
 
 def cosort(A, B, reverse = False):
-    # 使用 zip 函数将两个数组合并成一个列表
     combined = list(zip(A, B))
-    # 按照 A 的值进行排序
     combined_sorted = sorted(combined, key=lambda x: x[0],reverse = reverse)
-    # 拆分回两个数组
     A_sorted, B_sorted = zip(*combined_sorted)
     return A_sorted, B_sorted
 
@@ -325,13 +300,13 @@ def generate_unitary_matrix(n, seed=None):
     if seed is not None:
         np.random.seed(seed)
     
-    # 随机生成一个 n x n 的复数矩阵
+    # Generate a random n x n complex matrix
     random_matrix = np.random.rand(n, n) + 1j * np.random.rand(n, n)
     
-    # QR 分解
+    # QR decomposition 
     q, r = np.linalg.qr(random_matrix)
     
-    # 调整 R 的对角线元素的相位，使得 Q 仍然是酉矩阵
+    # Modify R to ensure Q is unitary
     d = np.diagonal(r)
     ph = d / np.abs(d)
     q = q * ph
@@ -352,7 +327,7 @@ def schedule(x, funcname = 'Linear',epsilon=1e-10):
 
 
 j = complex(0,1)
-# 定义Pauli矩阵
+# Define Pauli matrices
 I = np.array([[1, 0], [0, 1]])
 X = np.array([[0, 1], [1, 0]])
 Y = np.array([[0, -1*j], [j, 0]])

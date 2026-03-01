@@ -15,7 +15,7 @@ from math import log10
 import time
 
 
-# data_generating() # If you want to generate sparse matrix and sparse vector for the first time, uncomment this line
+# data_generating() # If you want to generate sparse matrix and sparse vector, uncomment this line
 
 begin_time = time.time()
 
@@ -50,7 +50,7 @@ x0 = x0.transpose()
 dt = 0.05
 alpha = 10
 K = 3
-Ts = np.logspace(2,4, 1)
+Ts = np.logspace(2,4, 10)
 # Ts = np.array([   100.,    215.,    464.,   1000.,   2154.,   4641.,  10000.,
 #         21544.,  46415.])
 # Ts = [10000]
@@ -58,10 +58,12 @@ Ts = np.logspace(2,4, 1)
 errors = []
 filename = 'Data/QLSP.txt'
 file = open(filename, 'w')
-methods = ['Linear']#, 'Squ', 'Cub', 'Exp']
+methods = ['Linear']#, 'Squ', 'Cub', 'Exp']   #different schedule functions, see the manuscript for details
+
+print(f"{'T':>10} {'dt':>10} {'total error':>18} {'non-ad error':>18} {'gqsp error':>18}")
 
 for method in methods:
-    # 计算每个 dt 对应的误差
+    # Calculate the error of the GQSP algorithm for different evolution times
     errors = []
     file.write('K=3'+'\n')
     for p in range(len(Ts)):
@@ -79,18 +81,19 @@ for method in methods:
             xtmp = np.dot(GQSP(K, Hs,dt,alpha), xs)
             adxtmp = np.dot(expm(-1* j * dt* Hs) , adxs)
             adxs = adxtmp/norm(adxtmp)
-            # 按列归一化
+            # Normalize by columns
             xs = xtmp/norm(xtmp)
             gamma_tot = np.dot(xext,xs.conj())
             gamma_ad = np.dot(xext,adxs.conj())
-            gamma_lcu = np.dot(xs.transpose(),adxs.conj())
-            if (i+1) % 100 ==  0:
-                print(method,p,i, r, 1-abs(gamma_tot)**2,1-abs(gamma_ad)**2,1-abs(gamma_lcu)**2)
-        print('error = ', p,i, r, 1-abs(gamma_tot)**2,1-abs(gamma_ad)**2,1-abs(gamma_lcu)**2)
-        error = [T, 1-abs(gamma_tot)**2,1-abs(gamma_ad)**2,1-abs(gamma_lcu)**2]
+            gamma_gqsp = np.dot(xs.transpose(),adxs.conj())
+            # if (i+1) % 100 ==  0:
+            #     print(method,p,i, r, 1-abs(gamma_tot)**2,1-abs(gamma_ad)**2,1-abs(gamma_lcu)**2)
+
+        print(f"{T:>10.3f} {dt:>10.3f} {1-abs(gamma_tot)**2:>18.8e} {1-abs(gamma_ad)**2:>18.8e} {1-abs(gamma_gqsp)**2:>18.8e}")
+        error = [T, 1-abs(gamma_tot)**2,1-abs(gamma_ad)**2,1-abs(gamma_gqsp)**2]
         file.write(' '.join(map(str,error))+'\n')
         errors.append(error)
 file.close()
 
 end_time = time.time()
-print(f"程序运行时间: {end_time - begin_time:.2f} 秒")
+print(f"Runtime: {end_time - begin_time:.2f} s")
