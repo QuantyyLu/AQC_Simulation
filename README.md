@@ -92,6 +92,10 @@ python3 QLSP.py
 * To draw Fig 2-3:
 Run `/Fig/Figdrawer.ipynb`
 
+## Sudocode for the main scripts:
+![alt text](Algorithm1.png)
+![alt text](Algorithm2.png)
+
 ## 📊 Output
 The scripts will run the simulations and save the output data files into the `Data/` directory. You can then use this data for analysis and plotting.
 
