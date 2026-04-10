@@ -92,6 +92,10 @@ python3 QLSP.py
 * To draw Fig 2-3:
 Run `/Fig/Figdrawer.ipynb`
 
+## Data availability:
+The data for each figure are provided in the corresponding folders (for example, data for Fig.1(a) can be found in `/Fig/Fig1a/Fig1a_sub.txt`).
+
+
 ## Sudocode for the main scripts:
 ![alt text](Algorithm1.png)
 ![alt text](Algorithm2.png)
